@@ -1,0 +1,54 @@
+// Comments with double slash
+// No multiline comments
+
+// Declare functions with `func`
+// main is the starting point of the program
+func main() {
+	// Declare variables with var
+	// Uninitialized variables will default to their zero value
+	var x: int
+	// Assign to variables with `=`
+	x = add(5, 10)
+	// One line variable declaration
+	var y: int = add(44, 12)
+	// Inferred type
+	var z = add(55, 44)
+
+	// Basic Types
+	var str: string = "Hello, World!"
+	var char: char = 'B'
+	var boolean: bool = false
+	var floating_point: float = 143.2
+	var integer: int = 400
+
+	// Core functions are globally defined
+	// `print` takes any number of any type and prints to the console
+	print("Hello, World!")
+}
+
+// Structs are defined with `struct`
+struct Foo {
+	// Types are specified `name: type`
+	bar: int
+	// No comma after field
+	// Fields are specified on seperate lines
+	baz: string
+}
+
+// Enums are defined with `enum`
+// Unlike Rust, enums are not tagged unions
+enum FizzBuzz {
+	Fizz
+	Buzz
+	Bazz
+}
+
+// Function arguments are specified `name: type`
+// Return type is specified after the parenthesis
+// No return type means `void`
+func add(a: int, b: int) int {
+	// Arethmetic operations can be done between two numbers of the same type
+	// i.e float + float
+	//     int * int
+	return a + b
+}
