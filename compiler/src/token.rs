@@ -16,6 +16,9 @@ pub enum Token {
     Else,
     Switch,
     Case,
+    In,
+    Struct,
+    Enum,
     Plus,
     Minus,
     Divide,
@@ -28,6 +31,9 @@ pub enum Token {
     LessEqual,
     Bang,
     BangEqual,
+    Dot,
+    Comma,
+    Range,
     OpenParen,
     CloseParen,
     OpenBrace,
@@ -55,14 +61,23 @@ impl Token {
 
                 ':' => tokens.push(Token::Colon),
 
+                ',' => tokens.push(Token::Comma),
+                '.' => tokens.push(Token::Dot),
+
                 '+' => tokens.push(Token::Plus),
-                '-' => tokens.push(Token::Minus),
+                '-' => {
+                    if src.peek() == Some(&'>') {
+                        tokens.push(Token::Range);
+                    } else {
+                        tokens.push(Token::Minus);
+                    }
+                }
                 '*' => tokens.push(Token::Multiply),
                 '/' => {
                     if src.peek() == Some(&'/') {
                         while let Some(l) = src.next() {
                             if l == '\n' {
-                                continue;
+                                break;
                             }
                         }
                     } else {
@@ -106,11 +121,67 @@ impl Token {
                     }
                 }
 
-                c if c.is_alphabetic() => {
+                '\'' => {
+                    let Some(char) = src.next() else {
+                        panic!("Unterminated Char");
+                    };
+
+                    if src.peek() == Some(&'\'') {
+                        src.next();
+                        tokens.push(Token::CharLiteral(char));
+                    } else {
+                        panic!("Unterminated Char");
+                    }
+                }
+
+                '"' => {
+                    let mut str: Vec<char> = vec![];
+
+                    while src.peek().is_some_and(|&c| c != '"') {
+                        str.push(src.next().unwrap());
+                    }
+
+                    if src.peek().is_none() {
+                        panic!("Unterminated String");
+                    } else {
+                        src.next();
+                        tokens.push(Token::StringLiteral(str.iter().collect::<String>().into()))
+                    }
+                }
+
+                ';' => tokens.push(Token::SemiColon),
+
+                c if c.is_numeric() => {
+                    let mut str = vec![c];
+                    let mut float = false;
+
+                    while let Some(l) = src.peek() {
+                        if !l.is_numeric() && *l != '.' {
+                            break;
+                        }
+                        if *l == '.' && !float {
+                            float = true;
+                        }
+
+                        str.push(src.next().unwrap());
+                    }
+
+                    if float {
+                        tokens.push(Token::FloatLiteral(
+                            str.iter().collect::<String>().parse().unwrap(),
+                        ))
+                    } else {
+                        tokens.push(Token::IntLiteral(
+                            str.iter().collect::<String>().parse().unwrap(),
+                        ))
+                    }
+                }
+
+                c if c.is_alphabetic() || c == '_' => {
                     let mut str = vec![c];
 
                     while let Some(l) = src.peek() {
-                        if !l.is_alphanumeric() {
+                        if !l.is_alphanumeric() && *l != '_' {
                             break;
                         }
                         str.push(src.next().unwrap());
@@ -119,7 +190,10 @@ impl Token {
                     tokens.push(Token::keyword(str.iter().collect()));
                 }
                 c if c.is_ascii_whitespace() => continue,
-                _ => unimplemented!(),
+                c => {
+                    eprintln!("Unexpected Character: {c}");
+                    unimplemented!()
+                }
             }
         }
 
@@ -138,6 +212,9 @@ impl Token {
             "switch" => Token::Switch,
             "case" => Token::Case,
             "return" => Token::Return,
+            "in" => Token::In,
+            "struct" => Token::Struct,
+            "enum" => Token::Enum,
             x => Token::Keyword(x.into()),
         }
     }

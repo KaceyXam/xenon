@@ -23,7 +23,32 @@ func main() {
 
 	// Core functions are globally defined
 	// `print` takes any number of any type and prints to the console
+	// Automatically adds newline at the end
 	print("Hello, World!")
+
+	// Arrays are specified like this
+	// No fixed size arrays, because I don't want to.
+	var arr1: []int = [1, 2, 3, 4]
+
+	// For loop options
+	// Traditional
+	// `i++` doesn't exist because it's harder
+	// Can mutate array
+	for var i = 0; i < length(arr1); i += 1 {
+		arr1[i] *= 2
+	}
+
+	// For In
+	// Uses a copy for the loop. Won't mutate the array
+	for i in arr1 {
+		print(i)
+	}
+
+	// Range 
+	// Using Arrow because I think that seems neat
+	for i in 0->length(arr1) {
+		print(arr1[i])
+	}
 }
 
 // Structs are defined with `struct`
