@@ -18,7 +18,9 @@ func main() {
 	var str: string = "Hello, World!"
 	var char: char = 'B'
 	var boolean: bool = false
+	// Single Precision float
 	var floating_point: float = 143.2
+	// 64 bit int
 	var integer: int = 400
 
 	// Core functions are globally defined
@@ -43,12 +45,6 @@ func main() {
 	for i in arr1 {
 		print(i)
 	}
-
-	// Range 
-	// Using Arrow because I think that seems neat
-	for i in 0->length(arr1) {
-		print(arr1[i])
-	}
 }
 
 // Structs are defined with `struct`
@@ -56,6 +52,7 @@ struct Foo {
 	// Types are specified `name: type`
 	bar: int
 	// No comma after field
+	// Semicolon will be inserted automatically
 	// Fields are specified on seperate lines
 	baz: string
 }

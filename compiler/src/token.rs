@@ -1,6 +1,6 @@
-use std::{iter::Peekable, str::Chars, sync::Arc};
+use std::sync::Arc;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     Var,
     Keyword(Arc<str>),
@@ -33,7 +33,6 @@ pub enum Token {
     BangEqual,
     Dot,
     Comma,
-    Range,
     OpenParen,
     CloseParen,
     OpenBrace,
@@ -65,13 +64,7 @@ impl Token {
                 '.' => tokens.push(Token::Dot),
 
                 '+' => tokens.push(Token::Plus),
-                '-' => {
-                    if src.peek() == Some(&'>') {
-                        tokens.push(Token::Range);
-                    } else {
-                        tokens.push(Token::Minus);
-                    }
-                }
+                '-' => tokens.push(Token::Minus),
                 '*' => tokens.push(Token::Multiply),
                 '/' => {
                     if src.peek() == Some(&'/') {
@@ -189,7 +182,21 @@ impl Token {
 
                     tokens.push(Token::keyword(str.iter().collect()));
                 }
+
+                '\n' => {
+                    let is_valid_semicolon = |t: &Token| -> bool {
+                        *t != Token::OpenParen
+                            && *t != Token::OpenBrace
+                            && *t != Token::OpenBracket
+                            && *t != Token::SemiColon
+                    };
+                    if tokens.last().is_some_and(is_valid_semicolon) {
+                        tokens.push(Token::SemiColon)
+                    }
+                }
+
                 c if c.is_ascii_whitespace() => continue,
+
                 c => {
                     eprintln!("Unexpected Character: {c}");
                     unimplemented!()
